@@ -1,0 +1,1 @@
+GRANT USAGE ON INTEGRATION crunchbase_s3_int TO ROLE crunchbase_loader;
