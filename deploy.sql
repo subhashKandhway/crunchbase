@@ -1,0 +1,20 @@
+-- Master deployment script: run all infrastructure and grants in order
+-- Co-authored with CoCo
+--
+-- Execution order:
+--   1. Roles         (USERADMIN)
+--   2. Databases     (SYSADMIN)
+--   3. Schemas       (SYSADMIN)
+--   4. Warehouses    (SYSADMIN)
+--   5. WH grants     (SECURITYADMIN)
+--   6. Raw grants    (SECURITYADMIN)
+--   7. Prod grants   (SECURITYADMIN)
+--
+-- Run each file sequentially in a fresh session or use:
+--   snowsql -f infrastructure/01_roles.sql
+--   snowsql -f infrastructure/02_databases.sql
+--   snowsql -f infrastructure/03_schemas.sql
+--   snowsql -f infrastructure/04_warehouses.sql
+--   snowsql -f grants/01_warehouse_grants.sql
+--   snowsql -f grants/02_raw_grants.sql
+--   snowsql -f grants/03_prod_grants.sql
