@@ -23,5 +23,33 @@ FROM (
     FROM @crunchbase_raw.ingestion.crunchbase_s3_stage/objects/
 )
 FILE_FORMAT = (FORMAT_NAME = crunchbase_raw.ingestion.crunchbase_csv_format)
-ON_ERROR = 'ABORT_STATEMENT'
+-- CONTINUE skips the handful of malformed rows (unescaped quotes shifting
+-- columns) instead of aborting the entire 462K-row load
+ON_ERROR = 'CONTINUE'
 FORCE = FALSE;
+
+-- Log this load run into the ingestion audit table
+INSERT INTO crunchbase_raw.audit.ingestion_table_audit
+    (target_table, source_file_name, rows_parsed, rows_loaded, error_count,
+     first_error_message, first_error_line, load_status)
+SELECT 'crunchbase_raw.raw.objects', "file", "rows_parsed", "rows_loaded",
+       "errors_seen", "first_error", "first_error_line", "status"
+FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()));
+
+
+-- COPY INTO crunchbase_raw.raw.objects
+-- FROM @crunchbase_raw.ingestion.crunchbase_s3_stage/objects/
+-- FILE_FORMAT = (FORMAT_NAME = crunchbase_raw.ingestion.crunchbase_csv_format)
+-- VALIDATION_MODE = 'RETURN_ALL_ERRORS';
+
+
+
+-- SELECT *
+-- FROM TABLE(INFORMATION_SCHEMA.COPY_HISTORY(
+--     TABLE_NAME=>'CRUNCHBASE_RAW.RAW.OBJECTS',
+--     START_TIME=>DATEADD(HOUR,-2,CURRENT_TIMESTAMP())
+-- ));
+
+
+SELECT * FROM crunchbase_raw.raw.objects;
+

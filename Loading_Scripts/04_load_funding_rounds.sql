@@ -22,3 +22,11 @@ FROM (
 FILE_FORMAT = (FORMAT_NAME = crunchbase_raw.ingestion.crunchbase_csv_format)
 ON_ERROR = 'ABORT_STATEMENT'
 FORCE = FALSE;
+
+-- Log this load run into the ingestion audit table
+INSERT INTO crunchbase_raw.audit.ingestion_table_audit
+    (target_table, source_file_name, rows_parsed, rows_loaded, error_count,
+     first_error_message, first_error_line, load_status)
+SELECT 'crunchbase_raw.raw.funding_rounds', "file", "rows_parsed", "rows_loaded",
+       "errors_seen", "first_error", "first_error_line", "status"
+FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()));
