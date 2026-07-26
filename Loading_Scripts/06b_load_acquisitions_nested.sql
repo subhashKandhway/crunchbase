@@ -1,6 +1,7 @@
--- Load acquisitions_raw.json into the acquisitions landing table
--- Only the flat source file is loaded here; acquisitions_by_acquirer.json is a
--- grouped rollup of the same records and is handled separately via LATERAL FLATTEN.
+-- Load acquisitions_full_nested.json into the acquisitions landing table
+-- The outer array is stripped by STRIP_OUTER_ARRAY=TRUE in the JSON file format,
+-- so each element becomes one row; nested objects are read with dot-notation paths.
+-- No LATERAL FLATTEN is needed here because there are no nested arrays, only nested objects.
 -- Co-authored with CoCo
 
 USE ROLE CRUNCHBASE_LOADER;
@@ -33,7 +34,6 @@ FROM (
 FILE_FORMAT = (FORMAT_NAME = crunchbase_raw.ingestion.crunchbase_json_format)
 ON_ERROR = 'ABORT_STATEMENT'
 FORCE = FALSE;
-
 
 -- Log this load run into the ingestion audit table
 INSERT INTO crunchbase_raw.audit.ingestion_table_audit

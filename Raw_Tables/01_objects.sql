@@ -54,3 +54,8 @@ CREATE OR REPLACE TABLE crunchbase_raw.raw.objects (
     _loaded_at                  TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 )
 COMMENT = 'Landing table for objects.csv - master entity table (companies, people, funds, etc.)';
+
+
+
+
+SELECT * FROM crunchbase_raw.raw.objects limit 10;
